@@ -1,0 +1,14 @@
+{
+    "name": "vc-twitter-trend",
+    "require": {
+	"sunra/php-simple-html-dom-parser": "1.5.2",
+	"j4mie/idiorm" : "*",
+	"cakephp/app" : "3.4.*"
+    },
+
+    "autoload": {
+        "psr-4": {
+            "Lib\\Curl\\" : "lib/curl"
+        }
+    }
+}
