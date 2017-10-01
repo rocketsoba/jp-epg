@@ -1,6 +1,7 @@
 composer.lock
 mp3cookie.tmp
 vendor/
-lib/curl/cookie.txt
+cookie.txt
 imasdbscrape.php
 /*.html
+
