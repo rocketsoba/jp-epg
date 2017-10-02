@@ -6,7 +6,7 @@ require_once __DIR__ . "/../../../vendor/autoload.php";
 use Sunra\PhpSimple\HtmlDomParser;
 use Lib\Curl\MyCurl;
 
-class TvtimetableScrape
+class TvtimetableLibrary
 {
     private $program_elements = array();
     private $program_date = null;
@@ -97,6 +97,3 @@ class TvtimetableScrape
         }
     }
 }
-$test1 = new TvtimetableScrape();
-$test1->scape();
-var_dump($test1->getProgramElements());
