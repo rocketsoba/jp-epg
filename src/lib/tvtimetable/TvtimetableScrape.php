@@ -2,24 +2,34 @@
 date_default_timezone_set("Asia/Tokyo");
 ini_set("arg_separator.output", "&");
 
-require_once __DIR__ . "/vendor/autoload.php";
+require_once __DIR__ . "/../../../vendor/autoload.php";
 use Sunra\PhpSimple\HtmlDomParser;
 use Lib\Curl\MyCurl;
 
-class TvTimetableScrape
+class TvtimetableScrape
 {
     private $program_elements = array();
+    private $program_date = null;
     
     public function scape($target_url = "http://timetable.yanbe.net/html/13/2017/02/01_1.html?13")
     {
+        
         $program_rowspan_count_list = array();
         $program_name_list = array();
+
+        if (is_null($this->program_date)) {
+            $date_from_url = str_replace('http://timetable.yanbe.net/html/', '', $target_url);
+
+            if (preg_match('/^[0-9]+\/([0-9]{4})\/([0-9]{2})\/([0-9]{2})/', $date_from_url, $matches)) {
+                $this->program_date = $matches[1] . "-" . $matches[2] . "-" . $matches[3];
+            }
+        }
         
 	/* $curl1 = new MyCurl($target_url);
          * $result1 = $curl1->getResult();*/
 	/* file_put_contents(__DIR__ . "/tvtimetable.html", $result1);*/
 	/* echo $result1[0];*/
-	$result1 = file_get_contents(__DIR__ . "/tvtimetable.html");
+	$result1 = file_get_contents(__DIR__ . "/../../../tvtimetable.html");
 	$dom = HtmlDomParser::str_get_html($result1);
 	/* echo $dom->plaintext;*/
 	
@@ -66,8 +76,27 @@ class TvTimetableScrape
                 }
             }
         }
-        var_dump($this->program_elements);
+        /* var_dump($this->program_elements);*/
+    }
+    public function getProgramElements()
+    {
+        if (!is_null($this->program_elements)) {
+            return $this->program_elements;
+        }
+        else {
+            return false;
+        }
+    }
+    public function getProgramDate()
+    {
+        if (!is_null($this->program_date)) {
+            return $this->program_date;
+        }
+        else {
+            return false;
+        }
     }
 }
-$test1 = new TvTimetableScrape();
+$test1 = new TvtimetableScrape();
 $test1->scape();
+var_dump($test1->getProgramElements());
