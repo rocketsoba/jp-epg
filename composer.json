@@ -1,5 +1,6 @@
 {
     "name": "vc-twitter-trend",
+    
     "require": {
 	"sunra/php-simple-html-dom-parser": "1.5.2",
 	"j4mie/idiorm" : "*",
@@ -8,8 +9,8 @@
 
     "autoload": {
         "psr-4": {
-            "Lib\\Curl\\" : "src/lib/curl",
-            "Model\\" : "src/model"
+            "Lib\\" : "src/Lib",
+            "Model\\" : "src/Model"
         }
     }
 }

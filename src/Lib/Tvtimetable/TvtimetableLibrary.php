@@ -1,4 +1,7 @@
 <?php
+
+namespace Lib\Tvtimetable;
+
 date_default_timezone_set("Asia/Tokyo");
 ini_set("arg_separator.output", "&");
 
@@ -11,7 +14,7 @@ class TvtimetableLibrary
     private $program_elements = array();
     private $program_date = null;
     
-    public function scape($target_url = "http://timetable.yanbe.net/html/13/2017/02/01_1.html?13")
+    public function scrape($target_url = "http://timetable.yanbe.net/html/13/2017/02/01_1.html?13")
     {
         
         $program_rowspan_count_list = array();
@@ -57,9 +60,9 @@ class TvtimetableLibrary
                     $program_info = $ele2->find("span.program_contents", 0);
                     if (isset($program_time) && isset($program_title) && isset($program_info)) {
                         $this->program_elements[$program_name_list[$target_column[$ind2]]][] = [
-                            "time" => trim($program_time->plaintext),
+                            "program_time" => trim($program_time->plaintext),
                             "title" => trim($program_title->plaintext),
-                            "info" => html_entity_decode(trim($program_info->plaintext), ENT_HTML5 | ENT_QUOTES, 'UTF-8'),
+                            "infomation" => html_entity_decode(trim($program_info->plaintext), ENT_HTML5 | ENT_QUOTES, 'UTF-8'),
                         ];
                     }
                     $rowspan = (int) $ele2->getAttribute("rowspan");
