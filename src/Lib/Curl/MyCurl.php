@@ -106,6 +106,20 @@ class MyCurl
         return $this;
     }
 
+    function setPostData($post_params = null)
+    {
+        if (!is_array($post_params)) {
+            return false;
+        }
+        
+        $this->curl_options = [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => http_build_query($post_params)
+        ] + (array) $this->curl_options;
+        
+        return $this;
+    }
+
     function setAddtionalHeaders($add_headers)
     {
         if (is_array($add_headers)){
