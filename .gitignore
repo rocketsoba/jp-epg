@@ -3,6 +3,6 @@ mp3cookie.tmp
 vendor/
 cookie.txt
 imasdbscrape.php
-config/mysql_config.json
+config/*
 /*.html
 
