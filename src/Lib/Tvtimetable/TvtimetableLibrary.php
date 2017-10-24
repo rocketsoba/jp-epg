@@ -13,28 +13,81 @@ class TvtimetableLibrary
 {
     private $program_elements = array();
     private $program_date = null;
-    
-    public function scrape($target_url = "http://timetable.yanbe.net/html/13/2017/02/01_1.html?13")
+    private $program_datestring = null;
+    private $target_url = null;
+
+    private $target_url_prefix = 'http://timetable.yanbe.net/html/13/';
+    private $target_url_sufix = '_1.html?13';
+    private $tmp_path = __DIR__ . "/../../../tmp/Tvtimetable/";
+
+    public function __construct($target_string = null)
     {
+        if ($this->checkTargetArg($target_string)) {
+            $this->scrape();
+        }
+    }
+    
+    private function loadHTML()
+    {
+        $cache_path = $this->tmp_path . $this->program_datestring . ".html";
+        if (file_exists($cache_path)) {
+	    $html_result = file_get_contents($cache_path);
+        }
+        else {
+            $curl1 = new MyCurl($this->target_url);
+            $html_result = $curl1->getResult();
+	    file_put_contents($cache_path, $html_result);
+        }
+        return $html_result;
+    }
+
+    private function checkTargetArg($target_string = null)
+    {
+        if (!is_null($target_string)) {
+            $this->target_string = $target_string;
+        }
         
+        if (is_string($this->target_string)) {
+            if (preg_match('/^http:\/\/timetable\.yanbe\.net\/html\//', $target_string)) {
+                $this->target_url = $target_string;
+                $this->setProgramDate();
+                return true;
+            }
+            if (preg_match('/^([0-9]{4})-([0-9]{2})-([0-9]{2})/', $target_string, $matches)) {
+                $this->program_time = $target_string;
+                $this->setTargetUrl($matches);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function setProgramDate() {
+        if (is_null($this->program_date) && !is_null($this->target_url)) {
+            $date_from_url = str_replace($this->target_url_prefix, '', $this->target_url);
+
+            if (preg_match('/^([0-9]{4})\/([0-9]{2})\/([0-9]{2})/', $date_from_url, $matches)) {
+                $this->program_date = $matches[1] . "-" . $matches[2] . "-" . $matches[3];
+                $this->program_datestring = $matches[1] . $matches[2] . $matches[3];
+            }
+        }
+    }
+    
+    private function setTargetUrl($ymd = array()) {
+        if (is_null($this->target_url)) {
+            $this->target_url =
+                $this->target_url_prefix . $ymd[1] . "/" . $ymd[2] . "/" . $ymd[3] . $this->target_url_sufix;
+            $this->program_datestring = $ymd[1] . $ymd[2] . $ymd[3];
+        }
+    }
+    
+    public function scrape($target_url = null)
+    {
         $program_rowspan_count_list = array();
         $program_name_list = array();
 
-        if (is_null($this->program_date)) {
-            $date_from_url = str_replace('http://timetable.yanbe.net/html/', '', $target_url);
-
-            if (preg_match('/^[0-9]+\/([0-9]{4})\/([0-9]{2})\/([0-9]{2})/', $date_from_url, $matches)) {
-                $this->program_date = $matches[1] . "-" . $matches[2] . "-" . $matches[3];
-            }
-        }
-        
-	/* $curl1 = new MyCurl($target_url);
-         * $result1 = $curl1->getResult();*/
-	/* file_put_contents(__DIR__ . "/tvtimetable.html", $result1);*/
-	/* echo $result1[0];*/
-	$result1 = file_get_contents(__DIR__ . "/../../../tvtimetable.html");
-	$dom = HtmlDomParser::str_get_html($result1);
-	/* echo $dom->plaintext;*/
+        $html_result = $this->loadHTML();
+        $dom = HtmlDomParser::str_get_html($html_result);
 	
 	$program_table = $dom->find("table[cellspacing=0]", 0);
         $program_tr = $program_table->find("tr");
@@ -79,7 +132,6 @@ class TvtimetableLibrary
                 }
             }
         }
-        /* var_dump($this->program_elements);*/
     }
     public function getProgramElements()
     {
