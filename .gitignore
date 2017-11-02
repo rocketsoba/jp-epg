@@ -6,4 +6,5 @@ dump*.sql
 imasdbscrape.php
 config/*
 /*.html
+/tmp
 

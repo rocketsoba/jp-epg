@@ -31,6 +31,9 @@ class TvtimetableLibrary
         } else {
             $curl1 = new MyCurl($this->target_url);
             $html_result = $curl1->getResult();
+            if (!file_exists($this->tmp_path)) {
+                mkdir($this->tmp_path, 0775, true);
+            }
             file_put_contents($cache_path, $html_result);
         }
         return $html_result;
