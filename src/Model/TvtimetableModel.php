@@ -2,11 +2,6 @@
 
 namespace Model;
 
-date_default_timezone_set("Asia/Tokyo");
-ini_set("arg_separator.output", "&");
-
-require_once __DIR__ . "/../../vendor/autoload.php";
-
 use Sunra\PhpSimple\HtmlDomParser;
 use Lib\Curl\MyCurl;
 use Model\LoadModel;
@@ -25,7 +20,8 @@ class TvtimetableModel
         $this->loadStationList();
     }
 
-    private function loadStationList() {
+    private function loadStationList()
+    {
         $this->target_station_list = json_decode(file_get_contents($this->target_station_list_path), true);
     }
     
@@ -44,12 +40,10 @@ class TvtimetableModel
         }
         
         foreach ($program_elements as $ind1 => $ele1) {
-            
             $station_insert_array = ["name" => $ind1];
             if (isset($this->target_station_list[$ind1])) {
                 $station_insert_array["active_flag"] = 1;
-            }
-            else {
+            } else {
                 $station_insert_array["active_flag"] = 0;
             }
             $this->insertStationList($station_insert_array);
@@ -72,8 +66,7 @@ class TvtimetableModel
             ->find_array();
         if (!empty($result)) {
             return $result[0]["id"];
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -95,6 +88,7 @@ class TvtimetableModel
             return $table_status;
         }
     }
+    
     public function insertStationList($insert_array = null)
     {
         $table_object = \ORM::for_table("station_list");
@@ -111,6 +105,5 @@ class TvtimetableModel
                 ->save();
             return $table_status;
         }
-        
     }
 }

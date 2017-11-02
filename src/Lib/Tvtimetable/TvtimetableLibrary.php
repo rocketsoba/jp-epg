@@ -2,10 +2,6 @@
 
 namespace Lib\Tvtimetable;
 
-date_default_timezone_set("Asia/Tokyo");
-ini_set("arg_separator.output", "&");
-
-require_once __DIR__ . "/../../../vendor/autoload.php";
 use Sunra\PhpSimple\HtmlDomParser;
 use Lib\Curl\MyCurl;
 
@@ -31,12 +27,11 @@ class TvtimetableLibrary
     {
         $cache_path = $this->tmp_path . $this->program_datestring . ".html";
         if (file_exists($cache_path)) {
-	    $html_result = file_get_contents($cache_path);
-        }
-        else {
+            $html_result = file_get_contents($cache_path);
+        } else {
             $curl1 = new MyCurl($this->target_url);
             $html_result = $curl1->getResult();
-	    file_put_contents($cache_path, $html_result);
+            file_put_contents($cache_path, $html_result);
         }
         return $html_result;
     }
@@ -62,7 +57,8 @@ class TvtimetableLibrary
         return false;
     }
 
-    private function setProgramDate() {
+    private function setProgramDate()
+    {
         if (is_null($this->program_date) && !is_null($this->target_url)) {
             $date_from_url = str_replace($this->target_url_prefix, '', $this->target_url);
 
@@ -73,7 +69,8 @@ class TvtimetableLibrary
         }
     }
     
-    private function setTargetUrl($ymd = array()) {
+    private function setTargetUrl($ymd = array())
+    {
         if (is_null($this->target_url)) {
             $this->target_url =
                 $this->target_url_prefix . $ymd[1] . "/" . $ymd[2] . "/" . $ymd[3] . $this->target_url_sufix;
@@ -83,17 +80,18 @@ class TvtimetableLibrary
     
     public function scrape($target_url = null)
     {
-        $program_rowspan_count_list = array();
+        $rowspan_count = array();
         $program_name_list = array();
 
         $html_result = $this->loadHTML();
         $dom = HtmlDomParser::str_get_html($html_result);
-	
-	$program_table = $dom->find("table[cellspacing=0]", 0);
+        
+        $program_table = $dom->find("table[cellspacing=0]", 0);
         $program_tr = $program_table->find("tr");
+        
         $first_row = array_shift($program_tr);
         foreach ($first_row->find("td") as $ind1 => $ele1) {
-            $program_rowspan_count_list[$ind1] = 0;
+            $rowspan_count[$ind1] = 0;
             $program_name = trim($ele1->plaintext);
             if ($program_name !== "") {
                 $program_name_list[$ind1] = $program_name;
@@ -102,10 +100,11 @@ class TvtimetableLibrary
         foreach ($program_tr as $ind1 => $ele1) {
             $program_td = $ele1->find("td");
             $target_column = array();
-	    foreach ($program_rowspan_count_list as $ind2 => $ele2) {
-		if($ele2 == 0)
-		    $target_column[] = $ind2;
-	    }
+            foreach ($rowspan_count as $ind2 => $ele2) {
+                if ($ele2 == 0) {
+                    $target_column[] = $ind2;
+                }
+            }
             if (count($program_td) > 0) {
                 foreach ($program_td as $ind2 => $ele2) {
                     $program_time = $ele2->find("span.program_time", 0);
@@ -115,20 +114,24 @@ class TvtimetableLibrary
                         $this->program_elements[$program_name_list[$target_column[$ind2]]][] = [
                             "program_time" => trim($program_time->plaintext),
                             "title" => trim($program_title->plaintext),
-                            "infomation" => html_entity_decode(trim($program_info->plaintext), ENT_HTML5 | ENT_QUOTES, 'UTF-8'),
+                            "infomation" => html_entity_decode(
+                                trim($program_info->plaintext),
+                                ENT_HTML5 | ENT_QUOTES,
+                                'UTF-8'
+                            ),
                         ];
                     }
                     $rowspan = (int) $ele2->getAttribute("rowspan");
                     
                     /* emptyは関数の返り値を直接渡せる、issetはできない */
                     if (!empty($rowspan)) {
-                        $program_rowspan_count_list[$target_column[$ind2]] += $rowspan;
+                        $rowspan_count[$target_column[$ind2]] += $rowspan;
                     }
                 }
             }
-            foreach ($program_rowspan_count_list as $ind2 => $ele2) {
+            foreach ($rowspan_count as $ind2 => $ele2) {
                 if ($ele2 > 0) {
-                    $program_rowspan_count_list[$ind2]--;
+                    $rowspan_count[$ind2]--;
                 }
             }
         }
@@ -137,8 +140,7 @@ class TvtimetableLibrary
     {
         if (!is_null($this->program_elements)) {
             return $this->program_elements;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -146,8 +148,7 @@ class TvtimetableLibrary
     {
         if (!is_null($this->program_date)) {
             return $this->program_date;
-        }
-        else {
+        } else {
             return false;
         }
     }
