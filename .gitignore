@@ -2,6 +2,7 @@ composer.lock
 mp3cookie.tmp
 vendor/
 cookie.txt
+dump*.sql
 imasdbscrape.php
 config/*
 /*.html
