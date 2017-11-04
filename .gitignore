@@ -7,4 +7,5 @@ imasdbscrape.php
 config/*
 /*.html
 /tmp
+/debug
 
