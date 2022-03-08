@@ -1,6 +1,6 @@
 <?php
 
-namespace Lib\Curl;
+namespace Lib;
 
 class MyCurl
 {

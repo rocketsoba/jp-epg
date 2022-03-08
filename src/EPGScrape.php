@@ -1,11 +1,11 @@
 <?php
 
-namespace Lib\Tvtimetable;
+namespace Lib;
 
 use KubAT\PhpSimple\HtmlDomParser;
-use Lib\Curl\MyCurl;
+use Lib\MyCurl;
 
-class TvtimetableLibrary
+class EPGScrape
 {
     private $program_elements = array();
     private $program_date = null;
@@ -14,7 +14,7 @@ class TvtimetableLibrary
 
     private $target_url_prefix = 'http://timetable.yanbe.net/html/13/';
     private $target_url_sufix = '_1.html?13';
-    private $tmp_path = __DIR__ . "/../../../tmp/Tvtimetable/";
+    private $tmp_path = __DIR__ . "/../tmp/Tvtimetable/";
 
     public function __construct($target_string = null)
     {
