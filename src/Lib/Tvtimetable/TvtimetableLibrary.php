@@ -88,8 +88,8 @@ class TvtimetableLibrary
 
         $html_result = $this->loadHTML();
         $dom = HtmlDomParser::str_get_html($html_result);
-        
-        $program_table = $dom->find("table[cellspacing=0]", 0);
+
+        $program_table = $dom->find("table.d1_table", 0);
         $program_tr = $program_table->find("tr");
         
         $first_row = array_shift($program_tr);
@@ -111,17 +111,21 @@ class TvtimetableLibrary
             if (count($program_td) > 0) {
                 foreach ($program_td as $ind2 => $ele2) {
                     $program_time = $ele2->find("span.program_time", 0);
-                    $program_title = $ele2->find("a.lightwindow", 0);
-                    $program_info = $ele2->find("span.program_contents", 0);
-                    if (isset($program_time) && isset($program_title) && isset($program_info)) {
+                    $program_title = $ele2->find("span.program_title", 0);
+                    /**
+                     * $program_info = $ele2->find("span.program_contents", 0);
+                     */
+                    if (isset($program_time) && isset($program_title)) {
                         $this->program_elements[$program_name_list[$target_column[$ind2]]][] = [
                             "program_time" => trim($program_time->plaintext),
                             "title" => trim($program_title->plaintext),
-                            "infomation" => html_entity_decode(
-                                trim($program_info->plaintext),
-                                ENT_HTML5 | ENT_QUOTES,
-                                'UTF-8'
-                            ),
+                            /**
+                             * "infomation" => html_entity_decode(
+                             *     trim($program_info->plaintext),
+                             *     ENT_HTML5 | ENT_QUOTES,
+                             *     'UTF-8'
+                             * ),
+                             */
                         ];
                     }
                     $rowspan = (int) $ele2->getAttribute("rowspan");

@@ -8,4 +8,4 @@ config/*
 /*.html
 /tmp
 /debug
-
+.ac-php-conf.json

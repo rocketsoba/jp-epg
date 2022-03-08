@@ -9,6 +9,5 @@ use Model\TvtimetableModel;
 use Lib\Tvtimetable\TvtimetableLibrary;
 
 $lib1 = new TvtimetableLibrary("http://timetable.yanbe.net/html/13/2017/02/26_1.html?13");
-$model1 = new TvtimetableModel();
 var_dump($lib1->getProgramDate());
-$model1->insertWithDate($lib1->getProgramElements(), $lib1->getProgramDate());
+var_dump($lib1->getProgramElements());
