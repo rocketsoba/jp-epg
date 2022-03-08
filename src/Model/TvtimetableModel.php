@@ -2,7 +2,7 @@
 
 namespace Model;
 
-use Sunra\PhpSimple\HtmlDomParser;
+use KubAT\PhpSimple\HtmlDomParser;
 use Lib\Curl\MyCurl;
 use Model\LoadModel;
 

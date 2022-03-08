@@ -2,7 +2,7 @@
 
 namespace Lib\Tvtimetable;
 
-use Sunra\PhpSimple\HtmlDomParser;
+use KubAT\PhpSimple\HtmlDomParser;
 use Lib\Curl\MyCurl;
 
 class TvtimetableLibrary

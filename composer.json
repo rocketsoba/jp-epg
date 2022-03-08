@@ -1,8 +1,8 @@
 {
     "name": "rocketsoba/jp-epg",
     "require": {
-        "sunra/php-simple-html-dom-parser": "1.5.2",
-        "j4mie/idiorm": "*"
+        "j4mie/idiorm": "*",
+        "kub-at/php-simple-html-dom-parser": "^1.9"
     },
     "autoload": {
         "psr-4": {
