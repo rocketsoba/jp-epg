@@ -9,3 +9,5 @@ config/*
 /tmp
 /debug
 .ac-php-conf.json
+.cookie.txt
+.useragent.json
