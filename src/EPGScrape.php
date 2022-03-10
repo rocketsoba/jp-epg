@@ -12,6 +12,7 @@ class EPGScrape
 {
     private $programs = [];
     private $date = "";
+    private $channels = [];
 
     public function __construct($date = "")
     {
@@ -20,7 +21,11 @@ class EPGScrape
 
     public function scrape($date = "")
     {
-        if ($date !== "") {
+        if ($date === "") {
+            if ($this->date === "") {
+                $this->date = date("Y-m-d", time());
+            }
+        } else {
             $this->date = $date;
         }
 
@@ -28,6 +33,10 @@ class EPGScrape
             $scraper = new KakakuScrape($this->date);
         } else {
             throw new Exception("Error");
+        }
+
+        if (!empty($this->channels)) {
+            $scraper->setChannels($this->channels);
         }
 
         $scraper->scrape();
@@ -52,6 +61,11 @@ class EPGScrape
 
         $curl_object = $curl_object->build();
         return $curl_object;
+    }
+
+    public function setChannels(array $channels)
+    {
+        $this->channels = $channels;
     }
 
     public function getPrograms()

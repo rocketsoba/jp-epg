@@ -2,7 +2,6 @@
 
 namespace Rocketsoba\EPG\Datasource;
 
-use DateTime;
 use Exception;
 use Rocketsoba\Curl\MyCurl;
 use Rocketsoba\Curl\MyCurlBuilder;
@@ -29,22 +28,32 @@ class KakakuScrape
 
     private $programs = [];
     private $date = "";
+    private $channels = [];
 
-    public function __construct($date = "")
+    public function __construct($date = "", $channels = [4, 6, 8, 10, 12])
     {
         $this->date = $date;
+        $this->channels = $channels;
     }
 
-    public function scrape($date = "", $channels = [4, 6, 8, 10, 12])
+    public function scrape($date = "", $channels = [])
     {
-        if ($date !== "") {
+        if ($date === "") {
+            if ($this->date === "") {
+                $this->date = date("Y-m-d", time());
+            }
+        } else {
             $this->date = $date;
         }
+        if (!empty($channels)) {
+            $this->channels = $channels;
+        }
 
+        $this->channels = $this->validateChannels($this->channels);
         $unixtime = $this->validateDate($this->date);
         $formated_date = date("Ymd", $unixtime);
 
-        foreach ($channels as $val1) {
+        foreach ($this->channels as $val1) {
             if (!array_key_exists($val1, $this->channel_list)) {
                 throw new Exception("invalid channel");
             }
@@ -118,6 +127,24 @@ class KakakuScrape
         return $unixtime;
     }
 
+    public function validateChannels(array $channels)
+    {
+        $result = array_map(function ($value) {
+            if (array_key_exists($value, $this->channel_list)) {
+                return $value;
+            }
+            if (($key = array_search($value, $this->channel_list)) !== false) {
+                return $key;
+            }
+            if (($key = array_search($value, $this->channel_code)) !== false) {
+                return $key;
+            }
+            return false;
+        }, $channels);
+
+        return array_filter($result);
+    }
+
     public function request($method, $uri, $options = [])
     {
         $curl_object = new MyCurlBuilder($uri);
@@ -134,6 +161,11 @@ class KakakuScrape
 
         $curl_object = $curl_object->build();
         return $curl_object;
+    }
+
+    public function setChannels(array $channels)
+    {
+        $this->channels = $channels;
     }
 
     public function getPrograms()

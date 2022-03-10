@@ -7,6 +7,7 @@ use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Rocketsoba\EPG\EPGScrape;
 
@@ -27,7 +28,20 @@ class ScrapeCommand extends Command
              ->setDescription("Scrape EPG")
              ->addArgument(
                  "date",
-                 InputArgument::REQUIRED
+                 InputArgument::OPTIONAL
+             )
+             ->addOption(
+                 "channel",
+                 null,
+                 InputOption::VALUE_REQUIRED,
+                 "channel",
+                 null
+             )
+             ->addOption(
+                 "limit",
+                 null,
+                 InputOption::VALUE_REQUIRED,
+                 "limit"
              );
     }
 
@@ -36,8 +50,17 @@ class ScrapeCommand extends Command
         $this->logger->pushHandler(new ConsoleHandler($output));
 
         $date = $input->getArgument("date");
+        $channel = $input->getOption("channel");
 
-        $scraper = new EPGScrape($date);
+        if (is_null($date)) {
+            $scraper = new EPGScrape();
+        } else {
+            $scraper = new EPGScrape($date);
+        }
+        if (!is_null($channel)) {
+            $scraper->setChannels([$channel]);
+        }
+
         $programs = $scraper->scrape()
                             ->getPrograms();
 
