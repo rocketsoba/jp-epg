@@ -49,15 +49,17 @@ class KakakuScrape
             $this->channels = $channels;
         }
 
-        $this->channels = $this->validateChannels($this->channels);
-        $unixtime = $this->validateDate($this->date);
+        $this->channels = $this->convertChannels($this->channels);
+
+        /**
+         * Throwable
+         */
+        $this->validateDate($this->date);
+
+        $unixtime = strtotime($this->date);
         $formated_date = date("Ymd", $unixtime);
 
         foreach ($this->channels as $val1) {
-            if (!array_key_exists($val1, $this->channel_list)) {
-                throw new Exception("invalid channel");
-            }
-
             $constructed_url = $this->url . "channel=" . $val1 . "/date=" . $formated_date . "/";
             $curl_object = $this->request("GET", $constructed_url);
             if ($curl_object->getHttpCode() !== 200) {
@@ -65,6 +67,14 @@ class KakakuScrape
             }
 
             $dom = new DomParserAdapter($curl_object->getResult());
+
+            $dom2 = clone $dom;
+
+            $dom2->findOne("title");
+            if (strpos(trim($dom2->plaintext), $this->channel_list[$val1]) === false) {
+                throw new Exception("Fetched page is not for '" . $this->channel_list[$val1] . "'");
+            }
+
             $dom->findOne("div#programlist")
                 ->findOne("table")
                 ->findMany("tr");
@@ -80,15 +90,12 @@ class KakakuScrape
                 if (count($a_elements) == 2) {
                     $title = trim($a_elements[0]->plaintext);
                     $program_date_str = trim($a_elements[1]->plaintext);
-                } elseif (count($a_elements) == 1) {
-                    $title = "";
-                    $program_date_str = trim($a_elements[0]->plaintext);
                 } else {
-                    throw new Exception("program title and date are not found");
+                    throw new Exception("Program title and date are not found");
                 }
 
                 if (!preg_match('/(\d{4})年(\d{1,2})月(\d{1,2})日[^\d]+(\d{2}):(\d{2})(.+)(\d{2}):(\d{2})$/', $program_date_str, $matches)) {
-                    throw new Exception("date is not found");
+                    throw new Exception("Date is not found");
                 }
 
                 $start_date = $matches[1] . "-" . $matches[2] . "-" . $matches[3] . " " . $matches[4] . ":" . $matches[5] . ":00";
@@ -114,29 +121,29 @@ class KakakuScrape
     public function validateDate($date = "")
     {
         if (date_default_timezone_get() === "UTC") {
-            throw new Exception("please set timezone");
+            throw new Exception("Please set timezone");
         }
         if (
             !($unixtime = strtotime($date)) ||
             $unixtime > time() ||
             $unixtime < strtotime($this->date_limit)
         ) {
-            throw new Exception("invalid date");
+            throw new Exception("Invalid date");
         }
 
-        return $unixtime;
+        return true;
     }
 
-    public function validateChannels(array $channels)
+    public function convertChannels(array $channels)
     {
         $result = array_map(function ($value) {
-            if (array_key_exists($value, $this->channel_list)) {
+            if (is_numeric($value) && array_key_exists($value, $this->channel_list)) {
                 return $value;
             }
-            if (($key = array_search($value, $this->channel_list)) !== false) {
+            if (is_string($value) && ($key = array_search($value, $this->channel_list)) !== false) {
                 return $key;
             }
-            if (($key = array_search($value, $this->channel_code)) !== false) {
+            if (is_string($value) && ($key = array_search($value, $this->channel_code)) !== false) {
                 return $key;
             }
             return false;
@@ -166,6 +173,16 @@ class KakakuScrape
     public function setChannels(array $channels)
     {
         $this->channels = $channels;
+    }
+
+    public function getChannels()
+    {
+        return $this->channels;
+    }
+
+    public function getDate()
+    {
+        return $this->date;
     }
 
     public function getPrograms()

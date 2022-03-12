@@ -11,3 +11,5 @@ config/*
 .ac-php-conf.json
 .cookie.txt
 .useragent.json
+build/
+.phpunit.result.cache

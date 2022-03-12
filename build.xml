@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="jp-epg" default="build">
+  <target name="prepare">
+    <delete dir="build"/>
+    <mkdir dir="build"/>
+    <mkdir dir="build/clover"/>
+  </target>
+
+  <target name="phpunit">
+    <exec returnProperty="phpunit_returncode" command="phpunit
+                   --configuration 'phpunit.xml.dist'
+                   --log-junit 'build/testsuites.xml'
+                   "
+          />
+  </target>
+
+  <target name="coverage">
+    <exec returnProperty="coverage_returncode" command="env XDEBUG_MODE=coverage phpunit
+                   --configuration 'phpunit.xml.dist'
+                   --coverage-html 'build/clover'
+                   --coverage-clover 'build/coverage.xml'
+                   "
+          />
+  </target>
+
+  <target name="phpcs">
+    <exec returnProperty="phpcs_returncode" command="phpcs
+                   --standard='PSR12'
+                   --report=checkstyle
+                   --report-file='build/phpcs.xml'
+                   src/
+                   tests/
+                   "
+          />
+  </target>
+  <target name="phpcpd">
+    <exec command="phpcpd
+                   --log-pmd='build/phpcpd.xml'
+                   src/
+                   tests/
+                   "
+          />
+  </target>
+
+  <target name="check">
+    <if>
+      <isfailure code="${phpunit_returncode}"/>
+      <then>
+        <fail msg="phpunit is failed"/>
+      </then>
+    </if>
+    <if>
+      <or>
+        <not><available file="build/testsuites.xml"/></not>
+        <not><available file="build/phpcs.xml"/></not>
+        <not><available file="build/coverage.xml"/></not>
+        <not><available file="build/clover/index.html"/></not>
+        <not><available file="build/phpcpd.xml"/></not>
+      </or>
+      <then>
+        <fail msg="build does not work correctly"/>
+      </then>
+    </if>
+  </target>
+
+  <target name="build" depends="prepare,phpunit,coverage,phpcs,phpcpd,check"/>
+</project>
