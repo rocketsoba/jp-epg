@@ -9,6 +9,7 @@
         }
     ],
     "require": {
+        "php": ">=7.2.5",
         "rocketsoba/curl-builder": "^0.1.0",
         "rocketsoba/dom-parser-wrapper": "^0.2.0",
         "symfony/console": "^5.4",
@@ -36,6 +37,7 @@
             "Rocketsoba\\EPG\\" : "src/"
         }
     },
+    "bin": ["bin/epg"],
     "scripts": {
         "test": "phpunit",
         "update-require": "composer require --with-all-dependencies rocketsoba/curl-builder rocketsoba/dom-parser-wrapper symfony/console symfony/monolog-bridge monolog/monolog && composer require --with-all-dependencies --dev phpunit/phpunit mockery/mockery",
