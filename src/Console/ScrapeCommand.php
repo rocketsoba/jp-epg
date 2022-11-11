@@ -34,14 +34,8 @@ class ScrapeCommand extends Command
                  "channel",
                  null,
                  InputOption::VALUE_REQUIRED,
-                 "channel",
+                 "channel (if you don't specify chahnnel, all channels are returned.) [optional] [available channnels: NTV, TBS, CX, EX, TX]",
                  null
-             )
-             ->addOption(
-                 "limit",
-                 null,
-                 InputOption::VALUE_REQUIRED,
-                 "limit"
              );
     }
 
